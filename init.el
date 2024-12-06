@@ -1,3 +1,4 @@
+(setq debug-on-error t)
 ;; Ref
 ;; https://github.com/rexim/dotfiles/blob/master/.emacs
 ;; SHELL
@@ -14,6 +15,11 @@
      (seq-some (lambda (x) (if (file-exists-p x) x nil)) xlist)))
   (t nil)))
 
+
+
+(add-hook 'before-change-major-mode-hook (lambda () (setq indent-tabs-mode nil)))
+
+
 ;; Must have
 (setq custom-file "~/.emacs.d/custom.el")
 (package-initialize)
@@ -26,16 +32,26 @@
 (add-to-list 'default-frame-alist `(font . "Iosevka NF-13"))
 
 ;; Theme
-(use-package gruber-darker-theme)
-(load-theme 'gruber-darker t)
+(use-package gruber-darker-theme
+  :init
+  (load-theme 'gruber-darker t))
+;;(load-theme 'gruber-darker t)
+
+;; Edit config bind
+;; (use-package emacs
+;;     :bind (
+;;            ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
+;;          ))
 
 ;; Enable/Disable default emacs stuff and qol
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
 (global-display-line-numbers-mode)
-(indent-tabs-mode 0)
-(setq-default fill-column 0)
+ (add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil))) ;; disable conv spaces to tabs
+;;(setq-default fill-column -1)
+;;(add-hook 'magit-status-mode (setq fill-column 80))
+;;(add-hook 'magit-mode (setq fill-column 80))
 (setq make-backup-files nil)
 (setq auto-save-list-file-name nil)
 (setq initial-scratch-message nil)
@@ -98,9 +114,13 @@
 (add-to-list 'auto-mode-alist '("Cask" . emacs-lisp-mode))
 
 ;; Whitespace mode
+
+
 (defun rc/set-up-whitespace-handling ()
   (interactive)
   (whitespace-mode 1)
+  (fill-column -1)
+  (setq whitespace-style '(face tabs spaces trailing lines space-before-tab newline space-after-tab newline-mark))
   (add-to-list 'write-file-functions 'delete-trailing-whitespace))
 
 (dolist (hook '(tuareg-mode-hook c++-mode-hook c-mode-hook simpc-mode-hook
@@ -117,11 +137,12 @@
   :config
   (setq magit-auto-revert-mode nil)
   :bind (("C-c m s" . magit-status)
-         ("C-c m l" . magit-log)))
+        ("C-c m l" . magit-log)))
+
 
 ;; Multiple cursors
 (use-package multiple-cursors
-    :bind (("C-S-c C-S-c" . mc/edit-lines)
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
          ("C->"         . mc/mark-next-like-this)
          ("C-<"         . mc/mark-previous-like-this)
          ("C-c C-<"     . mc/mark-all-like-this)
