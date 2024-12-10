@@ -1,4 +1,5 @@
 (setq debug-on-error t)
+;;(setq whitespace-style (remq 'indentation whitespace-style))
 ;; Ref
 ;; https://github.com/rexim/dotfiles/blob/master/.emacs
 ;; SHELL
@@ -14,7 +15,6 @@
            )))
      (seq-some (lambda (x) (if (file-exists-p x) x nil)) xlist)))
   (t nil)))
-
 
 
 (add-hook 'before-change-major-mode-hook (lambda () (setq indent-tabs-mode nil)))
@@ -33,22 +33,24 @@
 
 ;; Theme
 (use-package gruber-darker-theme
-  :init
+  :demand t
+  :config
   (load-theme 'gruber-darker t))
 ;;(load-theme 'gruber-darker t)
 
 ;; Edit config bind
-;; (use-package emacs
-;;     :bind (
-;;            ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
-;;          ))
+(use-package emacs
+  :ensure nil
+  :bind (
+           ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
+         ))
 
 ;; Enable/Disable default emacs stuff and qol
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
 (global-display-line-numbers-mode)
- (add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil))) ;; disable conv spaces to tabs
+(add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil))) ;; disable conv spaces to tabs
 ;;(setq-default fill-column -1)
 ;;(add-hook 'magit-status-mode (setq fill-column 80))
 ;;(add-hook 'magit-mode (setq fill-column 80))
@@ -60,7 +62,7 @@
 (column-number-mode 1)
 
 (blink-cursor-mode 0)
-(fset 'yes-or-no-p 'y-or-n-)pi
+(fset 'yes-or-no-p 'y-or-n-)
 (set-language-environment "UTF-8")
 (put 'overwrite-mode 'disabled t)
 
@@ -113,22 +115,25 @@
             (local-set-key (kbd "C-c C-j") 'eval-print-last-sexp)))
 (add-to-list 'auto-mode-alist '("Cask" . emacs-lisp-mode))
 
-;; Whitespace mode
+;; Whitespacemode
 
-
-(defun rc/set-up-whitespace-handling ()
-  (interactive)
-  (whitespace-mode 1)
-  (fill-column -1)
-  (setq whitespace-style '(face tabs spaces trailing lines space-before-tab newline space-after-tab newline-mark))
-  (add-to-list 'write-file-functions 'delete-trailing-whitespace))
-
-(dolist (hook '(tuareg-mode-hook c++-mode-hook c-mode-hook simpc-mode-hook
-                 emacs-lisp-mode-hook java-mode-hook lua-mode-hook rust-mode-hook
-                 scala-mode-hook markdown-mode-hook haskell-mode-hook
-                 python-mode-hook erlang-mode-hook asm-mode-hook fasm-mode-hook
-                 go-mode-hook nim-mode-hook yaml-mode-hook porth-mode-hook))
-  (add-hook hook 'rc/set-up-whitespace-handling))
+(use-package whitespace
+  :ensure nil
+  :init
+  (defvar my-whitespace-enabled-modes
+    '(tuareg-mode-hook c++-mode-hook c-mode-hook simpc-mode-hook
+      emacs-lisp-mode-hook java-mode-hook lua-mode-hook rust-mode-hook
+      scala-mode-hook markdown-mode-hook haskell-mode-hook
+      python-mode-hook erlang-mode-hook asm-mode-hook fasm-mode-hook
+      go-mode-hook nim-mode-hook yaml-mode-hook porth-mode-hook)
+    "List of hooks where `whitespace-mode` should be enabled.")
+  :config
+  (setq whitespace-style
+        '(face tabs spaces trailing lines space-before-tab
+               newline empty space-after-tab space-mark tab-mark newline-mark
+               missing-newline-at-eof))
+  (dolist (hook my-whitespace-enabled-modes)
+    (add-hook hook #'whitespace-mode)))
 
 ;; Magit + transient
 (use-package transient)
@@ -142,7 +147,7 @@
 
 ;; Multiple cursors
 (use-package multiple-cursors
-  :bind (("C-S-c C-S-c" . mc/edit-lines)
+  :bind (("C-S-c C-S-c" . mc/lines)
          ("C->"         . mc/mark-next-like-this)
          ("C-<"         . mc/mark-previous-like-this)
          ("C-c C-<"     . mc/mark-all-like-this)
@@ -153,7 +158,7 @@
 (use-package helm
     :bind (("C-c h t" . helm-cmd-t)
          ("C-c h g g" . helm-git-grep)
-         ("C-c h g l" . helm-ls-git-ls)
+         ("C-c h g l" . helm-ls-git)
          ("C-c h f" . helm-find)
          ("C-c h a" . helm-org-agenda-files-headings)
          ("C-c h r" . helm-recentf))
@@ -166,7 +171,7 @@
 ;; Yasnippet
 (use-package yasnippet
   :config
-  (setq yas/triggers-in-field nil)
+  (setq yas-triggers-in-field nil)
   (setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
   (yas-global-mode 1))
 
@@ -189,10 +194,10 @@
                                      'proof-assert-until-point-interactive))))
 
 ;; LaTeX mode
-(add-hook 'tex-mode-hook
-          (lambda ()
-            (interactive)
-            (add-to-list 'tex-verbatim-environments "code")))
+;; (add-hook 'tex-mode-hook
+;;           (lambda ()
+;;             (interactive)
+;;             (add-to-list 'tex-verbatim-environments "code")))
 
 (setq font-latex-fontify-sectioning 'color)
 
@@ -201,11 +206,25 @@
   :bind (("M-p" . move-text-up)
          ("M-n" . move-text-down)))
 
-;; Treesit auto
-(use-package treesit-auto
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all))
+;; LSP
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  )
 
+
+(use-package lsp-java
+  :config
+  (add-hook 'java-mode-hook 'lsp))
+
+;; PDF
+;; (use-package pdf-tools
+;; ;;  :pin manual
+;;   ;; :config
+;;   ;; (setq-default pdf-view-display-size 'fit-page)
+;;   )
+
+;; Dired
 (require 'dired-x)
 (use-package dired
   :ensure nil
