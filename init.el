@@ -62,7 +62,8 @@
 (column-number-mode 1)
 
 (blink-cursor-mode 0)
-(fset 'yes-or-no-p 'y-or-n-)
+(fset 'yes-or-no-p 'y-or-n-p)
+
 (set-language-environment "UTF-8")
 (put 'overwrite-mode 'disabled t)
 
