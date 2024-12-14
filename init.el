@@ -38,12 +38,8 @@
   (load-theme 'gruber-darker t))
 ;;(load-theme 'gruber-darker t)
 
-;; Edit config bind
-(use-package emacs
-  :ensure nil
-  :bind (
-           ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
-         ))
+
+
 
 ;; Enable/Disable default emacs stuff and qol
 (menu-bar-mode 0)
@@ -70,6 +66,8 @@
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 (setq next-line-add-newlines t)
+
+
 ;; Mouse
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; amout of line(s) at a time
 (setq mouse-wheel-progressive-speed nil)            ; don't accelerate scrolling
@@ -117,16 +115,15 @@
 (add-to-list 'auto-mode-alist '("Cask" . emacs-lisp-mode))
 
 ;; Whitespacemode
-
 (use-package whitespace
   :ensure nil
   :init
   (defvar my-whitespace-enabled-modes
     '(tuareg-mode-hook c++-mode-hook c-mode-hook simpc-mode-hook
-      emacs-lisp-mode-hook java-mode-hook lua-mode-hook rust-mode-hook
-      scala-mode-hook markdown-mode-hook haskell-mode-hook
-      python-mode-hook erlang-mode-hook asm-mode-hook fasm-mode-hook
-      go-mode-hook nim-mode-hook yaml-mode-hook porth-mode-hook)
+                       emacs-lisp-mode-hook java-mode-hook lua-mode-hook rust-mode-hook
+                       scala-mode-hook markdown-mode-hook haskell-mode-hook
+                       python-mode-hook erlang-mode-hook asm-mode-hook fasm-mode-hook
+                       go-mode-hook nim-mode-hook yaml-mode-hook porth-mode-hook)
     "List of hooks where `whitespace-mode` should be enabled.")
   :config
   (setq whitespace-style
@@ -234,5 +231,23 @@
         (concat dired-omit-files "\\|^\\..+$"))
   (setq-default dired-dwim-target t)
   (setq dired-listing-switches "-alh"))
+
+;; (use-package dired+
+;;   :load-path "~/.emacs.d/packages/dired-extensions")
+
+(use-package ls-lisp+
+  :load-path "~/.emacs.d/packages/dired-extensions")
+
+(use-package files+
+  :load-path "~/.emacs.d/packages/dired-extensions")
+;; Edit config bind
+
+(use-package emacs
+  :ensure nil
+  :bind (
+           ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
+           ("C-x C-d" . dired-jump)
+           ("C-x 4 C-d" . dired-jump-other-window)
+         ))
 
 (load-file custom-file)
