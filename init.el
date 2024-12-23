@@ -85,7 +85,8 @@
 (use-package ido-completing-read+
   :after ido
   :config
-  (ido-ubiquitous-mode 1))
+  (ido-ubiquitous-mode 1)
+  )
 
 (use-package smex
     :bind (
@@ -102,6 +103,7 @@
                          (interactive)
                          (c-toggle-comment-style -1)))
 
+(setq ido-show-dot-for-dired t)
 ;; Paredit
 (use-package paredit
     :hook (
@@ -208,7 +210,12 @@
 (use-package lsp-mode
   :init
   (setq lsp-keymap-prefix "C-c l")
-  )
+  :bind
+  ("C-c f" . flymake-goto-next-error)
+  ("C-c b" . flymake-goto-prev-error)
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil)
+  :commands (lsp lsp-deferred))
 
 
 (use-package lsp-java
@@ -240,14 +247,25 @@
 
 (use-package files+
   :load-path "~/.emacs.d/packages/dired-extensions")
-;; Edit config bind
 
+(use-package projectile
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map))
+  :config
+  (setq projectile-project-search-path '("E:/!dev/!!!cpp/")))
+
+;; Edit config bind
 (use-package emacs
   :ensure nil
   :bind (
-           ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
-           ("C-x C-d" . dired-jump)
-           ("C-x 4 C-d" . dired-jump-other-window)
+         ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
+         ("C-x C-d" . dired-jump)
+         ("C-x 4 C-d" . dired-jump-other-window)
          ))
+
+
 
 (load-file custom-file)
