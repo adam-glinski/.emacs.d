@@ -6,7 +6,7 @@
  '(fill-column 999)
  '(indent-tabs-mode -1)
  '(package-selected-packages
-   '(projectile pdf-tools lsp-java lsp-mode gruber-darker-theme yasnippet treesit-auto smex proof-general paredit multiple-cursors move-text magit ido-completing-read+ helm-ls-git helm-git-grep company))
+   '(goto-last-change smart-comment projectile pdf-tools lsp-java lsp-mode gruber-darker-theme yasnippet treesit-auto smex proof-general paredit multiple-cursors move-text magit ido-completing-read+ helm-ls-git helm-git-grep company))
  '(whitespace-line-column nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

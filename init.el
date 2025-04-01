@@ -1,4 +1,5 @@
-(setq debug-on-error t)
+;; config debugging
+;;(setq debug-on-error t)
 ;;(setq whitespace-style (remq 'indentation whitespace-style))
 ;; Ref
 ;; https://github.com/rexim/dotfiles/blob/master/.emacs
@@ -22,6 +23,7 @@
 
 ;; Must have
 (setq custom-file "~/.emacs.d/custom.el")
+(setq temporary-file-directory "~/.emacs.d/tmp/")
 (package-initialize)
 
 ;; MELPA
@@ -222,12 +224,20 @@
   :config
   (add-hook 'java-mode-hook 'lsp))
 
-;; PDF
-;; (use-package pdf-tools
-;; ;;  :pin manual
-;;   ;; :config
-;;   ;; (setq-default pdf-view-display-size 'fit-page)
-;;   )
+
+;; NOTE: to install server run:
+;; (with-environment-variables
+;;     (("CFLAGS"
+;;       (mapconcat #'identity `("-D_GNU_SOURCE" ,(getenv "CFLAGS")) " ")))
+;;   (pdf-tools-install))
+(use-package pdf-tools
+  ;;  :pin manual
+  ;; :config
+  ;; (setq-default pdf-view-display-size 'fit-page)
+  :hook (pdf-view-mode . (lambda ()
+                      (display-line-numbers-mode -1)
+                      (pdf-view-themed-minor-mode)))
+)
 
 ;; Dired
 (require 'dired-x)
@@ -255,7 +265,17 @@
               ("s-p" . projectile-command-map)
               ("C-c p" . projectile-command-map))
   :config
-  (setq projectile-project-search-path '("E:/!dev/!!!cpp/")))
+  (setq projectile-project-search-path '("E:/!dev/!!!cpp/"))
+  (setq projectile-switch-project-action 'projectile-dired))
+
+;; Smart comment
+(use-package smart-comment
+  :bind ("M-;" . smart-comment))
+
+;; Go to last change
+(use-package goto-last-change
+  :bind (
+         ("C-c C-o" . goto-last-change)))
 
 ;; Edit config bind
 (use-package emacs
@@ -264,6 +284,7 @@
          ("C-c C-c e" . (lambda () (interactive) (find-file user-init-file)))
          ("C-x C-d" . dired-jump)
          ("C-x 4 C-d" . dired-jump-other-window)
+         ("M-;" . smart-comment)
          ))
 
 
