@@ -203,6 +203,24 @@
 
 (setq font-latex-fontify-sectioning 'color)
 
+;; Evil mode
+(use-package evil
+  :demand t
+  :bind (("<escape>" . keyboard-escape-quit))
+  :init
+  (setq evil-search-module 'evil-search)
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1)
+  )
+
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-want-integration t)
+  (evil-collection-init)
+)
+
 ;; Move Text
 (use-package move-text
   :bind (("M-p" . move-text-up)
